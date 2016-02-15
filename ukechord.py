@@ -1,19 +1,27 @@
 #!/usr/bin/python2
-"""Generate chord PDFs."""
+"""./ukechord.py -o out.pdf input.chd
+
+Generate Ukulele song sheets with chords.
+
+Input files are in ChordPro-ish format,
+output files in PDF format.
+"""
 
 import contextlib
+import optparse
 import re
 import sys
 
-from reportlab.pdfgen import canvas
-from reportlab.lib import pagesizes
 from reportlab.lib import colors
+from reportlab.lib import pagesizes
 from reportlab.lib.units import cm
+from reportlab.pdfgen import canvas
 
 
 pt = 1  # Just for clarity
 
 
+# TODO: Extend this list of chords!
 _UKE_CHORDS = {
   "A7": (0, 1, 0, 0),
   "Dm": (2, 2, 1, 0),
@@ -272,16 +280,34 @@ def read_chordpro(lines, pdf_writer):
     pdf_writer.finish()
 
 
-def main(args):
-  if len(args) == 2:
-    outfile = open(args[1], "w")
-  elif len(args) == 1:
-    outfile = sys.stdout
-  else:
-    sys.exit("Usage: ukechord INFILENAME [OUTFILENAME]")
+def _parse_options(args):
+  """Return (options, args)."""
+  parser = optparse.OptionParser(usage=__doc__)
+  parser.add_option("-o", "--output", dest="outfile",
+                    help="set output filename (default: stdout)",
+                    default="-")
+  options, args = parser.parse_args(args)
 
-  pdf_writer = PdfWriter(outfile, pagesizes.A4)
-  read_chordpro(open(args[0]).readlines(), pdf_writer)
+  if options.outfile == "-":
+    options.outfile = "/dev/stdout"
+
+  if len(args) == 1:
+    options.infile = args[0]
+  elif not args:
+    options.infile = "/dev/stdin"
+  else:
+    parser.error("Need at least one input file.")
+
+  return options, args
+
+
+def main(args):
+  opts, args = _parse_options(args)
+
+  with open(opts.outfile, "w") as outfile:
+    with open(opts.infile, "r") as infile:
+      pdf_writer = PdfWriter(outfile, pagesizes.A4)
+      read_chordpro(infile.readlines(), pdf_writer)
 
 
 if __name__ == "__main__":
