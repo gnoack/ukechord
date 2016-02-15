@@ -18,31 +18,9 @@ from reportlab.lib.units import cm
 from reportlab.pdfgen import canvas
 
 import chordpro
-
+import uke
 
 pt = 1  # Just for clarity
-
-
-# TODO: Extend this list of chords!
-_UKE_CHORDS = {
-  "A7": (0, 1, 0, 0),
-  "Dm": (2, 2, 1, 0),
-  "E7": (1, 2, 0, 2),
-  "A": (2, 1, 0, 0),
-  "C": (0, 0, 0, 3),
-  "D": (2, 2, 2, 0),
-  "D7": (2, 2, 2, 3),
-  "G7": (0, 2, 1, 2),
-  "G": (0, 2, 3, 2),
-  "Bb": (3, 2, 1, 1),
-  "C7": (0, 0, 0, 1),
-  "Am": (2, 0, 0, 0),
-  "Cm": (0, 3, 3, 3),
-  "Fm": (1, 0, 1, 3),
-  "F": (2, 0, 1, 0),
-  "Db": (1, 1, 1, 4),
-  "Eb": (0, 3, 3, 1), #?
-}
 
 
 class PdfWriter(object):
@@ -205,7 +183,7 @@ class PdfWriter(object):
     with self.savedState():
       c.translate(self._rightmargin - 1*cm - 0.15*cm, self._lyricstop - 0.48*cm)
       for chordname in self._seen_chords:
-        self.drawChord(0.8*cm, 1*cm, chordname, frets=_UKE_CHORDS[chordname])
+        self.drawChord(0.8*cm, 1*cm, chordname, frets=uke.CHORDS[chordname])
 
     c.drawText(self._lyrics_text)
     c.drawText(self._chord_text)
