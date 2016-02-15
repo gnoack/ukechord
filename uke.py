@@ -1,3 +1,4 @@
+"""Ukulele chord definitions."""
 
 # TODO: Extend this list of chords!
 CHORDS = {
