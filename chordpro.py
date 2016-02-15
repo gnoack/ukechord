@@ -3,6 +3,10 @@
 import re
 
 
+class ChordProError(Exception):
+  pass
+
+
 def _analyze_chordpro_textline(line):
   """Analyze the text and chords in a line of text.
 
@@ -58,13 +62,14 @@ def _interpret_chordpro_lines(lines, pdf_writer, in_chorus=False):
       pdf_writer.addComment(value)
     elif key in ("soc", "start-of-chorus", "start_of_chorus"):
       if in_chorus:
-        raise Exception("Nested choruses!")
+        raise ChordProError("ChordPro: Nested choruses are not supported.")
       with pdf_writer.chorusSection():
         _interpret_chordpro_lines(lines, pdf_writer, in_chorus=True)
     elif key in ("eoc", "end-of-chorus", "end_of_chorus"):
       if in_chorus:
         return
-      raise Exception("End of chorus command without matching start.")
+      raise ChordProError(
+        "End-of-chorus ChordPro command without matching start.")
     elif key == "define":
       continue  # TODO: Support this!
     elif key in ("title", "subtitle"):
@@ -72,7 +77,7 @@ def _interpret_chordpro_lines(lines, pdf_writer, in_chorus=False):
     elif key == "fontsize":
       pdf_writer.setFontsize(int(value))
     else:
-      raise Exception("Unknown command: %s", key)
+      raise ChordProError("Unknown ChordPro command: %s", key)
 
 
 def _chordpro_set_title(lines, pdf_writer):

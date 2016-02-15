@@ -65,7 +65,7 @@ class PdfWriter(object):
     t.textLine()
     self._text_on_last_line = False
 
-  def drawChord(self, w, h, name, frets=(0, 0, 0, 0)):
+  def _drawChord(self, w, h, name, frets=(0, 0, 0, 0)):
     c = self._canvas
     xs = w / 3.0
     ys = h / 3.0
@@ -177,7 +177,7 @@ class PdfWriter(object):
     with self.savedState():
       c.translate(self._rightmargin - 1*cm - 0.15*cm, self._lyricstop - 0.48*cm)
       for chordname in self._seen_chords:
-        self.drawChord(0.8*cm, 1*cm, chordname, frets=uke.CHORDS[chordname])
+        self._drawChord(0.8*cm, 1*cm, chordname, frets=uke.CHORDS[chordname])
 
     c.drawText(self._lyrics_text)
     c.drawText(self._chord_text)
