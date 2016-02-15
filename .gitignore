@@ -1,0 +1,9 @@
+# PDF files
+*.pdf
+
+# ChordPro files
+*.chd
+*.cho
+
+# Temporary files
+*~
