@@ -4,18 +4,38 @@ import re
 
 
 def _analyze_chordpro_textline(line):
+  """Analyze the text and chords in a line of text.
+
+  Args:
+    line: The line of text, with chords in square brackets.
+
+  Returns:
+    A list of (chord, textchunk) tuples.
+    The chord is None for a leading piece of text without preceding chord.
+
+  Example:
+    Input:  "This is [Dm]an example [C]line."
+    Output: [(None, "This is "), ("Dm", "an example "), ("C", "line.")]
+  """
   matches = list(re.finditer(r"\[([^\]]+)\]([^\[]*)", line))
   if matches:
     result = []
     if matches[0].start(0):
       result.append((None, line[:matches[0].start(0)]))
-    for m in matches:
-      result.append(m.groups())
+    for match in matches:
+      result.append(match.groups())
     return result
   return [(None, line)]
 
 
 def _chordpro_line(line):
+  """Analyze a ChordPro line into a key value pair.
+
+  For commands of the form "{key:value}", those will be the key and value.
+  For empty lines, key is "$empty", and value is None.
+  For text lines, returns "$lyrics" as key
+    and a list of (chord, text) tuples as value
+  """
   line = line.strip()
   if not line:
     return ("$empty", None)
@@ -27,7 +47,7 @@ def _chordpro_line(line):
     return ("$lyrics", _analyze_chordpro_textline(line))
 
 
-def _read_chordpro_lines(lines, pdf_writer, in_chorus=False):
+def _interpret_chordpro_lines(lines, pdf_writer, in_chorus=False):
   for key, value in lines:
     if key == "$empty":
       pdf_writer.addLine("")
@@ -40,7 +60,7 @@ def _read_chordpro_lines(lines, pdf_writer, in_chorus=False):
       if in_chorus:
         raise Exception("Nested choruses!")
       with pdf_writer.chorusSection():
-        _read_chordpro_lines(lines, pdf_writer, in_chorus=True)
+        _interpret_chordpro_lines(lines, pdf_writer, in_chorus=True)
     elif key in ("eoc", "end-of-chorus", "end_of_chorus"):
       if in_chorus:
         return
@@ -52,7 +72,7 @@ def _read_chordpro_lines(lines, pdf_writer, in_chorus=False):
     elif key == "fontsize":
       pdf_writer.setFontsize(int(value))
     else:
-      raise Exception("Unknown command: %s", k)
+      raise Exception("Unknown command: %s", key)
 
 
 def _chordpro_set_title(lines, pdf_writer):
@@ -73,6 +93,6 @@ def convert(infile, pdf_writer):
   lines = map(_chordpro_line, infile.readlines())
   _chordpro_set_title(lines, pdf_writer)
   try:
-    _read_chordpro_lines(iter(lines), pdf_writer)
+    _interpret_chordpro_lines(iter(lines), pdf_writer)
   finally:
     pdf_writer.finish()
