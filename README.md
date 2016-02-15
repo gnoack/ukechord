@@ -4,4 +4,7 @@ Make Ukulele song sheets!
 
 Example:
 
-    ./ukechord.py INPUTFILE [OUTPUTFILE]
+    ./ukechord.py [-o OUTPUTFILE] INPUTFILE
+
+ * `INPUTFILE` should be in ChordPro format.
+ * `OUTPUTFILE` will be in PDF format.
