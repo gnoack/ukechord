@@ -25,6 +25,7 @@ class PdfWriter(object):
     self._rightmargin = self._width - 2*cm
 
     self._lyrics_text = self._canvas.beginText()
+    self._lyricstop = self._topmargin
     self._fontsize = 14
 
     self._chord_text = self._canvas.beginText()
