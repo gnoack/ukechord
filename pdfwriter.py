@@ -1,3 +1,5 @@
+"""PDF song sheet writer."""
+
 import contextlib
 
 from reportlab.lib import colors
@@ -16,10 +18,9 @@ class PdfWriter(object):
 
   def __init__(self, outfile, pagesize):
     self._canvas = canvas.Canvas(outfile, pagesize=pagesize)
-    self._canvas.setCreator("Uke Chord Generator v0.5 2016-02-15")
+    self._canvas.setCreator(u"Uke Chord Generator v0.5 2016-02-15")
     self._canvas.setFillColor(colors.black)
     self._topmargin = pagesize[1] - 1.5*cm
-    self._x = 2*cm
     self._width, self._height = pagesize
     self._leftmargin = 2*cm
     self._rightmargin = self._width - 2*cm
@@ -35,7 +36,11 @@ class PdfWriter(object):
     self._comment_text.setFont("Helvetica-Bold", 12)
     self._comment_text.setFillColor(colors.white)
 
+    # Keep track of the chords seen already.
     self._seen_chords = []
+
+    # Was there a text on the last line?  (For spacing)
+    # TODO: Better analyze lyrics into groups before entering the PDF writer.
     self._text_on_last_line = False
 
   def setFontsize(self, size):
@@ -58,7 +63,7 @@ class PdfWriter(object):
     with self.fillColor(colors.skyblue):
       self._canvas.rect(x, y, self._rightmargin - x, 7*pt, stroke=0, fill=1)
     t.textLine()
-    t._text_on_last_line = False
+    self._text_on_last_line = False
 
   def drawChord(self, w, h, name, frets=(0, 0, 0, 0)):
     c = self._canvas
@@ -108,8 +113,8 @@ class PdfWriter(object):
     t.setFont("Helvetica", self._fontsize)
     with self.fillColor(colors.skyblue):
       self._canvas.rect(
-        oldx, oldy + self._fontsize - 3, indent/2.0, newy-oldy,
-        stroke=0, fill=1)
+          oldx, oldy + self._fontsize - 3, indent/2.0, newy-oldy,
+          stroke=0, fill=1)
 
   @contextlib.contextmanager
   def fillColor(self, color):
@@ -134,10 +139,10 @@ class PdfWriter(object):
     self._comment_text.setTextOrigin(origx, origy)
     self._comment_text.textOut(' ' + comment + ' ')
     self._canvas.rect(
-      origx, origy - margin_bottom,
-      self._comment_text.getX() - origx,
-      self._fontsize + margin_bottom + margin_top,
-      stroke=0, fill=1)
+        origx, origy - margin_bottom,
+        self._comment_text.getX() - origx,
+        self._fontsize + margin_bottom + margin_top,
+        stroke=0, fill=1)
     self._lyrics_text.textLine()
     self._text_on_last_line = True
 

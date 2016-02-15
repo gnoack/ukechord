@@ -39,7 +39,7 @@ def _parse_options(args):
 def main(args):
   opts, args = _parse_options(args)
 
-  with open(opts.outfile, "w") as outfile:
+  with open(opts.outfile, "wb") as outfile:
     with open(opts.infile, "r") as infile:
       pdf_writer = pdfwriter.PdfWriter(outfile, pagesizes.A4)
       chordpro.convert(infile, pdf_writer)
