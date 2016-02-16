@@ -4,13 +4,17 @@ import unittest
 
 class IntegrationBaseTest(object):
 
-  def run_ukechord(self, chordpro, py_version=2):
-    proc = subprocess.Popen([self.BINARY, "ukechord.py", "-o", "/dev/null"],
-                            stdin=subprocess.PIPE)
+  def pythonBinary(self):
+    raise NotImplementedError("subclass responsibility")
+
+  def runUkechord(self, chordpro):
+    proc = subprocess.Popen(
+        [self.pythonBinary(), "ukechord.py", "-o", "/dev/null"],
+        stdin=subprocess.PIPE)
     proc.communicate(input=chordpro)
     return proc.wait()
 
-  def test_simple(self):
+  def testSimple(self):
     chordpro = "\n".join(
         "{title:This is an example song}"
         "{subtitle:With an example subtitle}"
@@ -26,16 +30,19 @@ class IntegrationBaseTest(object):
         "And another verse."
         "And no trailing newline."
     ).encode("utf-8")
-    self.assertEqual(0, self.run_ukechord(chordpro, py_version=2))
-    self.assertEqual(0, self.run_ukechord(chordpro, py_version=3))
+    self.assertEqual(0, self.runUkechord(chordpro))
 
 
-class IntegrationTestPython2(IntegrationBaseTest, unittest.TestCase):
-  BINARY = "python2"
+class Python2IntegrationTest(IntegrationBaseTest, unittest.TestCase):
+
+  def pythonBinary(self):
+    return "python2"
 
 
-class IntegrationTestPython3(IntegrationBaseTest, unittest.TestCase):
-  BINARY = "python3"
+class Python3IntegrationTest(IntegrationBaseTest, unittest.TestCase):
+
+  def pythonBinary(self):
+    return "python3"
 
 
 if __name__ == "__main__":

@@ -38,11 +38,11 @@ class LineParsingTest(unittest.TestCase):
 
   def testLyricsWithChords(self):
     self.assertParse(
-        "These are lyrics [D]with [G]some [C]chords.",
+        "These are lyrics [Dm]with [G7]some [C7]chords.",
         ("$lyrics", [(None, "These are lyrics "),
-                     ("D",  "with "),
-                     ("G",  "some "),
-                     ("C",  "chords.")]))
+                     ("Dm", "with "),
+                     ("G7", "some "),
+                     ("C7", "chords.")]))
 
 
 if __name__ == "__main__":
