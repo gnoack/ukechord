@@ -4,6 +4,7 @@ import re
 
 
 class ChordProError(Exception):
+  """Error in a ChordPro input."""
   pass
 
 
@@ -69,7 +70,7 @@ def _interpret_chordpro_lines(lines, pdf_writer, in_chorus=False):
       if in_chorus:
         return
       raise ChordProError(
-        "End-of-chorus ChordPro command without matching start.")
+          "End-of-chorus ChordPro command without matching start.")
     elif key == "define":
       continue  # TODO: Support this!
     elif key in ("title", "subtitle"):

@@ -1,12 +1,10 @@
 #!/usr/bin/python2
-"""./ukechord.py -o out.pdf input.chd
-
-Generate Ukulele song sheets with chords.
+"""Generate Ukulele song sheets with chords.
 
 Input files are in ChordPro-ish format, output files in PDF format.
 """
 
-import optparse
+import argparse
 import sys
 
 from reportlab.lib import pagesizes
@@ -17,30 +15,24 @@ import pdfwriter
 
 def _parse_options(args):
   """Return (options, args)."""
-  parser = optparse.OptionParser(usage=__doc__)
-  parser.add_option("-o", "--output", dest="outfile",
-                    help="set output filename (default: stdout)",
-                    default="-")
-  options, args = parser.parse_args(args)
-
-  if options.outfile == "-":
-    options.outfile = "/dev/stdout"
-
-  if len(args) == 1:
-    options.infile = args[0]
-  elif not args:
-    options.infile = "/dev/stdin"
-  else:
-    parser.error("Need at least one input file.")
-
-  return options, args
+  parser = argparse.ArgumentParser(
+      usage="%(prog)s [-o OUTFILE] [INFILE]",
+      description=__doc__)
+  parser.add_argument("-o", "--output", dest="outfile",
+                      nargs="?", default=sys.stdout,
+                      type=argparse.FileType('wb'),
+                      help="set output filename (default: stdout)")
+  parser.add_argument("infile", nargs="?", default=sys.stdin,
+                      type=argparse.FileType('r'),
+                      help="input filenames (default: stdin)")
+  return parser.parse_args(args)
 
 
 def main(args):
-  opts, args = _parse_options(args)
+  args = _parse_options(args)
 
-  with open(opts.outfile, "wb") as outfile:
-    with open(opts.infile, "r") as infile:
+  with args.outfile as outfile:
+    with args.infile as infile:
       pdf_writer = pdfwriter.PdfWriter(outfile, pagesizes.A4)
       chordpro.convert(infile, pdf_writer)
 
