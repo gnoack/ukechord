@@ -17,8 +17,8 @@ class PdfWriter(object):
   """Writes chord PDFs"""
 
   def __init__(self, outfile, pagesize):
-    self._canvas = canvas.Canvas(outfile, pagesize=pagesize)
-    self._canvas.setCreator(u"Uke Chord Generator v0.5 2016-02-15")
+    self._canvas = canvas.Canvas(outfile, invariant=True, pagesize=pagesize)
+    self._canvas.setCreator(u"Uke Chord Generator v0.6 2016-02-25")
     self._canvas.setFillColor(colors.black)
     self._topmargin = pagesize[1] - 1.5*cm
     self._width, self._height = pagesize
