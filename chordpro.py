@@ -96,7 +96,7 @@ def convert(infile, pdf_writer):
     infile: A readable file-like object.
     pdf_writer: A PDF writer for emitting the document.
   """
-  lines = map(_chordpro_line, infile.readlines())
+  lines = [_chordpro_line(line) for line in infile.readlines()]
   _chordpro_set_title(lines, pdf_writer)
   try:
     _interpret_chordpro_lines(iter(lines), pdf_writer)
