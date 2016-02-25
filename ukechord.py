@@ -32,6 +32,10 @@ def main(args):
   args = _parse_options(args)
 
   with args.outfile as outfile:
+    if outfile == sys.stdout:
+      # TODO: This is a terrible hack to use sys.stdout in binary mode.
+      outfile = getattr(outfile, 'buffer', outfile)
+
     with args.infile as infile:
       pdf_writer = pdfwriter.PdfWriter(outfile, pagesizes.A4)
       chordpro.convert(infile, pdf_writer)
