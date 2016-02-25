@@ -55,7 +55,7 @@ def _chordpro_line(line):
 def _interpret_chordpro_lines(lines, pdf_writer, in_chorus=False):
   for key, value in lines:
     if key == "$empty":
-      pdf_writer.addLine("")
+      pdf_writer.addLine([])
     elif key == "$lyrics":
       # Text
       pdf_writer.addLine(value)

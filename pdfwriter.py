@@ -154,14 +154,14 @@ class PdfWriter(object):
     """
     t = self._lyrics_text
 
-    has_text = any(text for chord, text in segments)
+    has_text = any(text for unused_chord, text in segments)
     if not has_text:
       if self._text_on_last_line:
         t.textLine()
         self._text_on_last_line = False
       return
 
-    if any(chord for chord, text in segments):
+    if any(chord for chord, unused_text in segments):
       t.textLine()  # Make space for chords.
 
     for chord, text in segments:
