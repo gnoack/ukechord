@@ -42,7 +42,7 @@ def _chordpro_line(line):
     and a list of (chord, text) tuples as value
   """
   line = line.strip()
-  if not line:
+  if not line or line.startswith("#"):
     return ("$empty", None)
 
   if line.startswith("{") and line.endswith("}"):
@@ -72,6 +72,12 @@ def _interpret_chordpro_lines(lines, pdf_writer, in_chorus=False):
       raise ChordProError(
           "End-of-chorus ChordPro command without matching start.")
     elif key == "define":
+      dm = re.match("\s+([A-Za-z0-9/+#]*)\s+frets\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})\s+fingers\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})", value)
+      # TODO: Implement finger positioning support
+      if dm: 
+        pdf_writer._chords[dm.group(1)] = (int(dm.group(2)), int(dm.group(3)), int(dm.group(4)), int(dm.group(5)))
+      else:
+        raise ChordProError("Chord definition parsing failed", value)
       continue  # TODO: Support this!
     elif key in ("title", "subtitle"):
       continue  # Handled earlier.
