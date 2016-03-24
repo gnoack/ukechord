@@ -54,7 +54,11 @@ def _chordpro_line(line):
 
 def _parse_chord_def(value):
   """Parse fret definitions"""
-  dm = re.match("\s+([A-Za-z0-9/+#]*)\s+frets\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})\s+fingers\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})", value)
+  dm = re.match(
+    r"\s+([A-Za-z0-9/+#]*)\s+"
+    r"frets\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})\s+"
+    r"fingers\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})",
+    value)
   # TODO: Implement finger positioning support
   if dm:
     return dm.group(1), (int(dm.group(2)), int(dm.group(3)), int(dm.group(4)), int(dm.group(5)))
