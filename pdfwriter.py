@@ -42,6 +42,7 @@ class PdfWriter(object):
     # Was there a text on the last line?  (For spacing)
     # TODO: Better analyze lyrics into groups before entering the PDF writer.
     self._text_on_last_line = False
+    self._chords = uke.CHORDS
 
   def setFontsize(self, size):
     self._fontsize = size
@@ -177,7 +178,7 @@ class PdfWriter(object):
     with self.savedState():
       c.translate(self._rightmargin - 1*cm - 0.15*cm, self._lyricstop - 0.48*cm)
       for chordname in self._seen_chords:
-        self._drawChord(0.8*cm, 1*cm, chordname, frets=uke.CHORDS[chordname])
+        self._drawChord(0.8*cm, 1*cm, chordname, frets=self._chords[chordname])
 
     c.drawText(self._lyrics_text)
     c.drawText(self._chord_text)
