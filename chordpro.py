@@ -52,6 +52,16 @@ def _chordpro_line(line):
     return ("$lyrics", _analyze_chordpro_textline(line))
 
 
+def _parse_chord_def(value):
+  """Parse fret definitions"""
+  dm = re.match("\s+([A-Za-z0-9/+#]*)\s+frets\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})\s+fingers\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})", value)
+  # TODO: Implement finger positioning support
+  if dm:
+    return dm.group(1), (int(dm.group(2)), int(dm.group(3)), int(dm.group(4)), int(dm.group(5)))
+  else:
+    raise ChordProError("Chord definition parsing failed", value)
+
+
 def _interpret_chordpro_lines(lines, pdf_writer, in_chorus=False):
   for key, value in lines:
     if key == "$empty":
@@ -72,13 +82,8 @@ def _interpret_chordpro_lines(lines, pdf_writer, in_chorus=False):
       raise ChordProError(
           "End-of-chorus ChordPro command without matching start.")
     elif key == "define":
-      dm = re.match("\s+([A-Za-z0-9/+#]*)\s+frets\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})\s+fingers\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})", value)
-      # TODO: Implement finger positioning support
-      if dm: 
-        pdf_writer._chords[dm.group(1)] = (int(dm.group(2)), int(dm.group(3)), int(dm.group(4)), int(dm.group(5)))
-      else:
-        raise ChordProError("Chord definition parsing failed", value)
-      continue  # TODO: Support this!
+      name, frets = _parse_chord_def(value)
+      pdf_writer._chords[name] = frets
     elif key in ("title", "subtitle"):
       continue  # Handled earlier.
     elif key == "fontsize":

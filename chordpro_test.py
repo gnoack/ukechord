@@ -3,6 +3,19 @@ import unittest
 import chordpro
 
 
+class ChordDefinitionTest(unittest.TestCase):
+
+  def testSimpleFret(self):
+    name, frets = chordpro._parse_chord_def(" Dm frets 0 1 2 2 fingers 1 2 3 4")
+    self.assertEqual("Dm", name)
+    self.assertEqual((0, 1, 2, 2), frets)
+
+  def testInvalidFret_garbageAtEnd(self):
+    self.assertRaises(
+      chordpro.ChordProError,
+      chordpro._parse_chord_def, " Dm frets 0 1 2 2xxx")
+
+
 class LineParsingTest(unittest.TestCase):
 
   def assertParse(self, line, expected_result):
