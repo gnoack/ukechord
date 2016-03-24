@@ -2,6 +2,8 @@
 
 import re
 
+import uke
+
 
 class ChordProError(Exception):
   """Error in a ChordPro input."""
@@ -53,17 +55,21 @@ def _chordpro_line(line):
 
 
 def _parse_chord_definition(value):
-  dm = re.match(
-    r"\s+([A-Za-z0-9/+#]*)"
-    r"\s+frets\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)"
-    r"\s+fingers\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)",
+  # TODO: Is it required to define 'fingers' in each chord definition?
+  match = re.match(
+    r"\s+(?P<name>[A-Za-z0-9/+#]*)\s+"
+    r"frets\s+(?P<frets>[\d\s]+)"
+    r"fingers\s+(?P<fingers>[\d\s]+)$",
     value)
   # TODO: Implement finger positioning support
   # TODO: Catch too high fret values
-  if not dm:
+  if not match:
     raise ChordProError("Chord definition parsing failed", value)
 
-  return dm.group(1), (int(dm.group(2)), int(dm.group(3)), int(dm.group(4)), int(dm.group(5)))
+  frets = [int(fret) for fret in match.group('frets').split(' ') if fret]
+  if any(fret > uke.MAX_FRET for fret in frets):
+    raise ChordProError("Frets beyond %d don't exist.", uke.MAX_FRET)
+  return match.group('name'), tuple(frets)
 
 
 def _interpret_chordpro_lines(lines, pdf_writer, in_chorus=False):

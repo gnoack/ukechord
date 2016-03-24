@@ -1,5 +1,9 @@
 """Ukulele chord definitions."""
 
+# TODO: Double check this number.
+# The biggest usable fret.
+MAX_FRET = 20
+
 # TODO: Extend this list of chords!
 CHORDS = {
     "A": (2, 1, 0, 0),
