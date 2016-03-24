@@ -55,11 +55,12 @@ def _chordpro_line(line):
 def _parse_chord_def(value):
   """Parse fret definitions"""
   dm = re.match(
-    r"\s+([A-Za-z0-9/+#]*)\s+"
-    r"frets\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})\s+"
-    r"fingers\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})\s+([0-9]{1,2})",
+    r"\s+([A-Za-z0-9/+#]*)"
+    r"\s+frets\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)"
+    r"\s+fingers\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)",
     value)
   # TODO: Implement finger positioning support
+  # TODO: Catch too high fret values
   if dm:
     return dm.group(1), (int(dm.group(2)), int(dm.group(3)), int(dm.group(4)), int(dm.group(5)))
   else:
