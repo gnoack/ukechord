@@ -52,8 +52,7 @@ def _chordpro_line(line):
     return ("$lyrics", _analyze_chordpro_textline(line))
 
 
-def _parse_chord_def(value):
-  """Parse fret definitions"""
+def _parse_chord_definition(value):
   dm = re.match(
     r"\s+([A-Za-z0-9/+#]*)"
     r"\s+frets\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)"
@@ -61,10 +60,10 @@ def _parse_chord_def(value):
     value)
   # TODO: Implement finger positioning support
   # TODO: Catch too high fret values
-  if dm:
-    return dm.group(1), (int(dm.group(2)), int(dm.group(3)), int(dm.group(4)), int(dm.group(5)))
-  else:
+  if not dm:
     raise ChordProError("Chord definition parsing failed", value)
+
+  return dm.group(1), (int(dm.group(2)), int(dm.group(3)), int(dm.group(4)), int(dm.group(5)))
 
 
 def _interpret_chordpro_lines(lines, pdf_writer, in_chorus=False):
@@ -87,7 +86,7 @@ def _interpret_chordpro_lines(lines, pdf_writer, in_chorus=False):
       raise ChordProError(
           "End-of-chorus ChordPro command without matching start.")
     elif key == "define":
-      name, frets = _parse_chord_def(value)
+      name, frets = _parse_chord_definition(value)
       pdf_writer._chords[name] = frets
     elif key in ("title", "subtitle"):
       continue  # Handled earlier.
