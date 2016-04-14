@@ -72,5 +72,47 @@ class LineParsingTest(unittest.TestCase):
                      ("C7", "chords.")]))
 
 
+class EquivalenceTest(unittest.TestCase):
+  def test_equivalence(self):
+    """PDFs generated through the AST should match the ones generated directly."""
+    # TODO: Only runs in Python3 for now.
+    import pdfwriter
+    import io
+    from reportlab.lib import pagesizes
+
+    infile = io.StringIO("\n".join((
+      "{title:This is an example song}",
+      "{subtitle:With an example subtitle}",
+      "",
+      "{define: Dm frets 0 1 2 2 fingers 1 2 3 4}"
+      "",
+      "This song has [Dm]example [C]lyrics.",
+      "And [C]another example line.",
+      "{comment: Unclear}",
+      "",
+      "{start_of_chorus}",
+      "[C]This is [D]a [G]chorus!",
+      "[C]This is [D]a [G]chorus!",
+      "{end_of_chorus}",
+      "",
+      "{comment: Haha}",
+      "",
+      "And another verse.",
+      "And no trailing newline.",
+    )))
+
+    old_out = io.BytesIO()
+    old_pdf = pdfwriter.PdfWriter(old_out, pagesizes.A4)
+    old_result = chordpro.convert(infile, old_pdf)
+
+    infile.seek(0)
+    new_out = io.BytesIO()
+    new_pdf = pdfwriter.PdfWriter(new_out, pagesizes.A4)
+    new_result = chordpro.to_ast(infile).write_out(new_pdf)
+
+    self.maxDiff = None
+    self.assertMultiLineEqual(str(old_out.getvalue()), str(new_out.getvalue()))
+
+
 if __name__ == "__main__":
   unittest.main()

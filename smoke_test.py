@@ -2,21 +2,21 @@ import subprocess
 import unittest
 
 
-_CHORDPRO_DATA = "\n".join(
-  "{title:This is an example song}"
-  "{subtitle:With an example subtitle}"
-  ""
-  "This song has [Dm]example [C]lyrics."
-  "And [C]another example line."
-  ""
-  "{start_of_chorus}"
-  "[C]This is [D]a [G]chorus!"
-  "[C]This is [D]a [G]chorus!"
-  "{end_of_chorus}"
-  ""
-  "And another verse."
-  "And no trailing newline."
-).encode("utf-8")
+_CHORDPRO_DATA = "\n".join((
+  "{title:This is an example song}",
+  "{subtitle:With an example subtitle}",
+  "",
+  "This song has [Dm]example [C]lyrics.",
+  "And [C]another example line.",
+  "",
+  "{start_of_chorus}",
+  "[C]This is [D]a [G]chorus!",
+  "[C]This is [D]a [G]chorus!",
+  "{end_of_chorus}",
+  "",
+  "And another verse.",
+  "And no trailing newline.",
+)).encode("utf-8")
 
 
 class IntegrationBaseTest(unittest.TestCase):

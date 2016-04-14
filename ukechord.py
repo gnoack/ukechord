@@ -38,7 +38,7 @@ def main(args):
 
     with args.infile as infile:
       pdf_writer = pdfwriter.PdfWriter(outfile, pagesizes.A4)
-      chordpro.convert(infile, pdf_writer)
+      chordpro.to_ast(infile).write_out(pdf_writer)
 
 
 if __name__ == "__main__":

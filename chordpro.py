@@ -2,6 +2,7 @@
 
 import re
 
+import song
 import uke
 
 
@@ -136,3 +137,61 @@ def convert(infile, pdf_writer):
     _interpret_chordpro_lines(iter(lines), pdf_writer)
   finally:
     pdf_writer.finish()
+
+
+def _convert_lines_to_ast_nodes(lines, chords, end_of_section_markers=()):
+  result = []
+  for key, value in lines:
+    if key in end_of_section_markers:
+      break
+    elif key == "$empty":
+      pass # ignore
+    elif key in ("$lyrics", "comment"):
+      if key == "$lyrics":
+        first_verse_item = song.Line(value)
+      elif key == "comment":
+        first_verse_item = song.Comment(value)
+      else:
+        raise ChordProError("Should never happen. - Programming error")
+
+      # Text
+      if end_of_section_markers:
+        # If we're in a section, lines are fine.
+        result.append(first_verse_item)
+      else:
+        verse_lines = _convert_lines_to_ast_nodes(
+          lines, chords=chords,
+          end_of_section_markers=("$empty"))
+        result.append(song.Verse([first_verse_item] + verse_lines))
+    elif key in ("soc", "start-of-chorus", "start_of_chorus"):
+      if end_of_section_markers:
+        raise ChordProError("ChordPro: Nested choruses are not supported.")
+      result.append(song.Chorus(
+        _convert_lines_to_ast_nodes(
+          lines, chords=chords,
+          end_of_section_markers=("eoc", "end-of-chorus", "end_of_chorus"))))
+    elif key == "define":
+      name, frets = _parse_chord_definition(value)
+      chords[name] = frets
+    elif key in ("title", "subtitle"):
+      continue  # Handled earlier.
+    elif key == "fontsize":
+      # TODO: How to handle font size?
+      pass  # Should translate to pdf_writer.setFontsize(int(value))
+    elif key in ("eoc", "end-of-chorus", "end_of_chorus"):
+      # If not already part of breaking condition.
+      raise ChordProError(
+          "End-of-chorus ChordPro command without matching start.")
+    else:
+      raise ChordProError("Unknown ChordPro command: %s", key)
+  return result
+
+
+def to_ast(infile):
+  lines = [_chordpro_line(line) for line in infile.readlines()]
+  keys_and_values = dict(lines)
+  title = keys_and_values.get("title", "").strip()
+  subtitle = keys_and_values.get("subtitle", "").strip()
+  chords = {}
+  children = _convert_lines_to_ast_nodes(iter(lines), chords=chords)
+  return song.Song(children, title=title, subtitle=subtitle, chords=chords)
