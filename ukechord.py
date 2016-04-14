@@ -33,7 +33,8 @@ def main(args):
 
   with args.outfile as outfile:
     if outfile == sys.stdout:
-      # TODO: This is a terrible hack to use sys.stdout in binary mode.
+      # TODO: This is a hack to use sys.stdout in binary mode.
+      # The input streams use the system encoding. (Set LANG=en_US.UTF-8)
       outfile = getattr(outfile, 'buffer', outfile)
 
     with args.infile as infile:
