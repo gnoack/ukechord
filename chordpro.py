@@ -72,9 +72,21 @@ def _parse_chord_definition(value):
   return match.group('name'), tuple(frets)
 
 
-def _interpret_chordpro_lines(lines, pdf_writer, in_chorus=False):
+def _interpret_chordpro_lines(lines, pdf_writer, end_of_section_markers=()):
+  """Interpret ChordPro lines, writing them to a PDF Writer.
+
+  Args:
+    lines: A lines iterator yielding (key, value) tuples.
+    pdf_writer: A PDF Writer.
+    end_of_section_markers: A collection of keys on which to return immediately.
+
+  Raises:
+    ChordProError: If things are wrongly nested.
+  """
   for key, value in lines:
-    if key == "$empty":
+    if key in end_of_section_markers:
+      return
+    elif key == "$empty":
       pdf_writer.addLine([])
     elif key == "$lyrics":
       # Text
@@ -82,15 +94,12 @@ def _interpret_chordpro_lines(lines, pdf_writer, in_chorus=False):
     elif key == "comment":
       pdf_writer.addComment(value)
     elif key in ("soc", "start-of-chorus", "start_of_chorus"):
-      if in_chorus:
+      if end_of_section_markers:
         raise ChordProError("ChordPro: Nested choruses are not supported.")
       with pdf_writer.chorusSection():
-        _interpret_chordpro_lines(lines, pdf_writer, in_chorus=True)
-    elif key in ("eoc", "end-of-chorus", "end_of_chorus"):
-      if in_chorus:
-        return
-      raise ChordProError(
-          "End-of-chorus ChordPro command without matching start.")
+        _interpret_chordpro_lines(
+          lines, pdf_writer,
+          end_of_section_markers=("eoc", "end-of-chorus", "end_of_chorus"))
     elif key == "define":
       name, frets = _parse_chord_definition(value)
       pdf_writer._chords[name] = frets
@@ -98,6 +107,10 @@ def _interpret_chordpro_lines(lines, pdf_writer, in_chorus=False):
       continue  # Handled earlier.
     elif key == "fontsize":
       pdf_writer.setFontsize(int(value))
+    elif key in ("eoc", "end-of-chorus", "end_of_chorus"):
+      # If not already part of breaking condition.
+      raise ChordProError(
+          "End-of-chorus ChordPro command without matching start.")
     else:
       raise ChordProError("Unknown ChordPro command: %s", key)
 
