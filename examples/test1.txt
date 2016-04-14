@@ -1,0 +1,12 @@
+This is an example song
+With an example subtitle
+===============================================================================
+
+This song has [Dm]example lyrics,
+and [C]another example line.
+
+- Chorus -
+[C]This is [D]a [G]chorus!
+[C]This is [D]a [G]chorus!
+
+And another line.

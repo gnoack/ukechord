@@ -7,6 +7,7 @@ Basic structure:
 Global information like titles and chords
 are properties of the top-level Song object.
 """
+# TODO: Rename to song_ast?
 
 class Line(object):
   def __init__(self, line):

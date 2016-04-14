@@ -1,6 +1,8 @@
+import io
 import unittest
 
 import chordpro
+import textwriter
 
 
 class ChordDefinitionTest(unittest.TestCase):
@@ -70,6 +72,23 @@ class LineParsingTest(unittest.TestCase):
                      ("Dm", "with "),
                      ("G7", "some "),
                      ("C7", "chords.")]))
+
+
+class SimpleConversionTest(unittest.TestCase):
+  def assertGeneratesText(self, infile, expected_outfile):
+    with open(expected_outfile, "r", encoding="utf-8") as expected_outfile:
+      expected_result = expected_outfile.read()
+
+    with open(infile, "r", encoding="utf-8") as infile:
+      with io.StringIO() as outfile:
+        chordpro.to_ast(infile).write_out(textwriter.TextWriter(outfile))
+        result = outfile.getvalue()
+
+    self.assertMultiLineEqual(result, expected_result)
+
+  def test_simple_song(self):
+    """PDFs generated through the AST should match the ones generated directly."""
+    self.assertGeneratesText("examples/test1.chd", "examples/test1.txt")
 
 
 if __name__ == "__main__":
